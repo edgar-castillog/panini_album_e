@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Álbum Mundial 2026</title>
+<meta name="google-client-id" content="520918963341-jnsd1nrs9abmkam9upobo76ohiqb2g7v.apps.googleusercontent.com">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --verde: #1a7a4a;
+    --verde-claro: #25a063;
+    --dorado: #c8a84b;
+    --fondo: #0e1a14;
+    --card: #162011;
+    --card2: #1c2b1e;
+    --texto: #e8f0ea;
+    --muted: #7a9980;
+    --rojo: #c0392b;
+    --azul: #2471a3;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+  header {
+    background: var(--card);
+    border-bottom: 2px solid var(--verde-claro);
+    padding: 16px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--dorado);
+  }
+  header p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .stats-bar {
+    display: flex;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--card2);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .stats-bar::-webkit-scrollbar { display: none; }
+  .stat {
+    background: var(--card);
+    border: 1px solid #2a3d2e;
+    border-radius: 10px;
+    padding: 10px 16px;
+    text-align: center;
+    min-width: 90px;
+    flex-shrink: 0;
+  }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--dorado); line-height: 1; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .progress-bar {
+    height: 4px;
+    background: #2a3d2e;
+    margin: 0 20px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--verde), var(--verde-claro));
+    transition: width 0.4s ease;
+  }
+  .controles {
+    display: flex;
+    gap: 10px;
+    padding: 14px 20px 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .btn-grupo {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+  .btn-f {
+    background: var(--card2);
+    border: 1px solid #2a3d2e;
+    color: var(--muted);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-f.activo, .btn-f:hover {
+    background: var(--verde);
+    color: white;
+    border-color: var(--verde);
+  }
+  .filtros-vista {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 14px;
+  }
+  .btn-vista {
+    background: var(--card2);
+    border: 1px solid #2a3d2e;
+    color: var(--muted);
+    border-radius: 8px;
+    padding: 7px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-vista.activo {
+    background: var(--dorado);
+    color: #0e1a14;
+    border-color: var(--dorado);
+    font-weight: 600;
+  }
+  .grupos {
+    padding: 0 20px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .grupo-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .grupo-letra {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    background: var(--verde);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .grupo-info { flex: 1; }
+  .grupo-info h2 { font-size: 15px; font-weight: 600; }
+  .grupo-info p { font-size: 12px; color: var(--muted); }
+  .grupo-prog {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: var(--dorado);
+  }
+  .selecciones {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .sel-card {
+    background: var(--card);
+    border: 1px solid #2a3d2e;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .sel-card:hover { border-color: var(--verde); }
+  .sel-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    cursor: pointer;
+    gap: 10px;
+  }
+  .sel-flag { font-size: 22px; }
+  .sel-nombre { font-weight: 600; font-size: 15px; flex: 1; }
+  .sel-codigo { font-size: 11px; color: var(--muted); background: var(--card2); padding: 2px 7px; border-radius: 4px; }
+  .sel-prog-text {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .sel-prog-text.completo { color: var(--dorado); }
+  .chevron {
+    color: var(--muted);
+    transition: transform 0.2s;
+    font-size: 18px;
+  }
+  .sel-card.abierto .chevron { transform: rotate(180deg); }
+  .sel-mini-bar {
+    height: 3px;
+    background: #2a3d2e;
+  }
+  .sel-mini-fill {
+    height: 100%;
+    background: var(--verde-claro);
+    transition: width 0.4s;
+  }
+  .estampas-grid {
+    display: none;
+    padding: 14px;
+    gap: 8px;
+  }
+  .sel-card.abierto .estampas-grid { display: flex; flex-wrap: wrap; }
+  .carga-rapida {
+    display: none;
+    padding: 10px 14px 0;
+    gap: 8px;
+    align-items: center;
+  }
+  .sel-card.abierto .carga-rapida { display: flex; }
+  .carga-input {
+    flex: 1;
+    background: var(--card2);
+    border: 1px solid #2a3d2e;
+    border-radius: 8px;
+    color: var(--texto);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: 'Inter', sans-serif;
+  }
+  .carga-input::placeholder { color: var(--muted); }
+  .carga-input:focus { outline: none; border-color: var(--verde); }
+  .btn-cargar {
+    background: var(--verde);
+    border: none;
+    color: white;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .btn-limpiar {
+    background: transparent;
+    border: 1px solid var(--rojo);
+    color: var(--rojo);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+  .stamp {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    border: 2px solid #2a3d2e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.12s;
+    background: var(--card2);
+    color: var(--muted);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .stamp.tengo {
+    background: var(--verde);
+    border-color: var(--verde-claro);
+    color: white;
+  }
+  .stamp.repetida {
+    background: var(--dorado);
+    border-color: #e8c060;
+    color: #0e1a14;
+  }
+  .stamp:active { transform: scale(0.88); }
+  .stamp-hint {
+    font-size: 11px;
+    color: var(--muted);
+    padding: 6px 14px 2px;
+    display: none;
+  }
+  .sel-card.abierto .stamp-hint { display: block; }
+  .filtros-vista-sel {
+    display: flex;
+    gap: 6px;
+    padding: 8px 14px 0;
+  }
+  .btn-vista-sel {
+    background: var(--card2);
+    border: 1px solid #2a3d2e;
+    color: var(--muted);
+    border-radius: 6px;
+    padding: 4px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+  }
+  .btn-vista-sel.activo { background: var(--card2); border-color: var(--verde); color: var(--verde-claro); }
+  .export-section {
+    padding: 20px;
+    background: var(--card2);
+    border-top: 1px solid #2a3d2e;
+  }
+  .export-section h3 { font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+  .export-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn-export {
+    background: var(--card);
+    border: 1px solid #2a3d2e;
+    color: var(--texto);
+    border-radius: 8px;
+    padding: 9px 18px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+  }
+  .btn-export:hover { border-color: var(--dorado); color: var(--dorado); }
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--verde);
+    color: white;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: transform 0.3s;
+    z-index: 999;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .hidden { display: none !important; }
+  .drive-section {
+    padding: 14px 20px;
+    background: var(--card);
+    border-bottom: 1px solid #2a3d2e;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .drive-status {
+    font-size: 13px;
+    color: var(--muted);
+    flex: 1;
+  }
+  .drive-status.conectado { color: var(--verde-claro); }
+  .btn-drive {
+    background: var(--card2);
+    border: 1px solid #2a3d2e;
+    color: var(--texto);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-drive:hover { border-color: var(--verde-claro); color: var(--verde-claro); }
+  .btn-drive.primary { background: var(--verde); border-color: var(--verde); color: white; }
+  .btn-drive:disabled { opacity: 0.4; cursor: not-allowed; }
+  @media (max-width: 400px) {
+    .stamp { width: 40px; height: 40px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚽ Álbum Mundial 2026</h1>
+  <p id="header-sub">Cargando...</p>
+</header>
+
+<div class="drive-section">
+  <span class="drive-status" id="drive-status">⚪ Google Drive: no conectado</span>
+  <button class="btn-drive primary" id="btn-login" onclick="driveLogin()">Conectar con Google</button>
+  <button class="btn-drive hidden" id="btn-guardar-drive" onclick="guardarEnDrive()">☁️ Guardar en Drive</button>
+  <button class="btn-drive hidden" id="btn-cargar-drive" onclick="cargarDesdeDrive()">📥 Cargar desde Drive</button>
+  <button class="btn-drive hidden" id="btn-logout" onclick="driveLogout()">Salir</button>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><div class="stat-num" id="s-tengo">0</div><div class="stat-label">Tengo</div></div>
+  <div class="stat"><div class="stat-num" id="s-faltan">960</div><div class="stat-label">Faltan</div></div>
+  <div class="stat"><div class="stat-num" id="s-pct">0%</div><div class="stat-label">Avance</div></div>
+  <div class="stat"><div class="stat-num" id="s-selcom">0</div><div class="stat-label">Sel. completas</div></div>
+  <div class="stat"><div class="stat-num" id="s-rep" style="color:var(--dorado)">0</div><div class="stat-label">Repetidas</div></div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="prog-global" style="width:0%"></div></div>
+
+<div class="controles">
+  <div class="btn-grupo" id="btn-grupos">
+    <button class="btn-f activo" data-g="ALL">Todos</button>
+    <button class="btn-f" data-g="A">A</button>
+    <button class="btn-f" data-g="B">B</button>
+    <button class="btn-f" data-g="C">C</button>
+    <button class="btn-f" data-g="D">D</button>
+    <button class="btn-f" data-g="E">E</button>
+    <button class="btn-f" data-g="F">F</button>
+    <button class="btn-f" data-g="G">G</button>
+    <button class="btn-f" data-g="H">H</button>
+    <button class="btn-f" data-g="I">I</button>
+    <button class="btn-f" data-g="J">J</button>
+    <button class="btn-f" data-g="K">K</button>
+    <button class="btn-f" data-g="L">L</button>
+  </div>
+</div>
+<div class="filtros-vista">
+  <button class="btn-vista activo" data-v="todas">Todas</button>
+  <button class="btn-vista" data-v="completas">✅ Completas</button>
+  <button class="btn-vista" data-v="incompletas">⚠️ Incompletas</button>
+  <button class="btn-vista" data-v="repetidas">🔄 Con repetidas</button>
+</div>
+
+<div class="grupos" id="grupos-container"></div>
+
+<div class="export-section">
+  <h3>Exportar / Importar</h3>
+  <div class="export-btns">
+    <button class="btn-export" onclick="exportarJSON()">💾 Guardar backup</button>
+    <button class="btn-export" onclick="importarJSON()">📂 Cargar backup</button>
+    <button class="btn-export" onclick="exportarFaltantes()">📋 Lista de faltantes</button>
+    <button class="btn-export" onclick="exportarRepetidas()">🔄 Para intercambio</button>
+  </div>
+  <input type="file" id="file-input" accept=".json" style="display:none" onchange="cargarArchivoJSON(event)">
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const EQUIPOS = [
+  {grupo:'A',cod:'MEX',nombre:'Mexico',bandera:'🇲🇽',pagina:8},
+  {grupo:'A',cod:'RSA',nombre:'South Africa',bandera:'🇿🇦',pagina:10},
+  {grupo:'A',cod:'KOR',nombre:'Korea Republic',bandera:'🇰🇷',pagina:12},
+  {grupo:'A',cod:'CZE',nombre:'Czechia',bandera:'🇨🇿',pagina:14},
+  {grupo:'B',cod:'CAN',nombre:'Canada',bandera:'🇨🇦',pagina:16},
+  {grupo:'B',cod:'BIH',nombre:'Bosnia-Herzegovina',bandera:'🇧🇦',pagina:18},
+  {grupo:'B',cod:'QAT',nombre:'Qatar',bandera:'🇶🇦',pagina:20},
+  {grupo:'B',cod:'SUI',nombre:'Switzerland',bandera:'🇨🇭',pagina:22},
+  {grupo:'C',cod:'BRA',nombre:'Brazil',bandera:'🇧🇷',pagina:24},
+  {grupo:'C',cod:'MAR',nombre:'Morocco',bandera:'🇲🇦',pagina:26},
+  {grupo:'C',cod:'HAI',nombre:'Haiti',bandera:'🇭🇹',pagina:28},
+  {grupo:'C',cod:'SCO',nombre:'Scotland',bandera:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',pagina:30},
+  {grupo:'D',cod:'USA',nombre:'USA',bandera:'🇺🇸',pagina:32},
+  {grupo:'D',cod:'PAR',nombre:'Paraguay',bandera:'🇵🇾',pagina:34},
+  {grupo:'D',cod:'AUS',nombre:'Australia',bandera:'🇦🇺',pagina:36},
+  {grupo:'D',cod:'TUR',nombre:'Türkiye',bandera:'🇹🇷',pagina:38},
+  {grupo:'E',cod:'GER',nombre:'Germany',bandera:'🇩🇪',pagina:40},
+  {grupo:'E',cod:'CUW',nombre:'Curaçao',bandera:'🇨🇼',pagina:42},
+  {grupo:'E',cod:'CIV',nombre:"Côte d'Ivoire",bandera:'🇨🇮',pagina:44},
+  {grupo:'E',cod:'ECU',nombre:'Ecuador',bandera:'🇪🇨',pagina:46},
+  {grupo:'F',cod:'NED',nombre:'Netherlands',bandera:'🇳🇱',pagina:48},
+  {grupo:'F',cod:'JPN',nombre:'Japan',bandera:'🇯🇵',pagina:50},
+  {grupo:'F',cod:'SWE',nombre:'Sweden',bandera:'🇸🇪',pagina:52},
+  {grupo:'F',cod:'TUN',nombre:'Tunisia',bandera:'🇹🇳',pagina:54},
+  {grupo:'G',cod:'BEL',nombre:'Belgium',bandera:'🇧🇪',pagina:58},
+  {grupo:'G',cod:'EGY',nombre:'Egypt',bandera:'🇪🇬',pagina:60},
+  {grupo:'G',cod:'IRN',nombre:'IR Iran',bandera:'🇮🇷',pagina:62},
+  {grupo:'G',cod:'NZL',nombre:'New Zealand',bandera:'🇳🇿',pagina:64},
+  {grupo:'H',cod:'ESP',nombre:'Spain',bandera:'🇪🇸',pagina:66},
+  {grupo:'H',cod:'CPV',nombre:'Cabo Verde',bandera:'🇨🇻',pagina:68},
+  {grupo:'H',cod:'KSA',nombre:'Saudi Arabia',bandera:'🇸🇦',pagina:70},
+  {grupo:'H',cod:'URU',nombre:'Uruguay',bandera:'🇺🇾',pagina:72},
+  {grupo:'I',cod:'FRA',nombre:'France',bandera:'🇫🇷',pagina:74},
+  {grupo:'I',cod:'SEN',nombre:'Senegal',bandera:'🇸🇳',pagina:76},
+  {grupo:'I',cod:'IRQ',nombre:'Iraq',bandera:'🇮🇶',pagina:78},
+  {grupo:'I',cod:'NOR',nombre:'Norway',bandera:'🇳🇴',pagina:80},
+  {grupo:'J',cod:'ARG',nombre:'Argentina',bandera:'🇦🇷',pagina:82},
+  {grupo:'J',cod:'ALG',nombre:'Algeria',bandera:'🇩🇿',pagina:84},
+  {grupo:'J',cod:'AUT',nombre:'Austria',bandera:'🇦🇹',pagina:86},
+  {grupo:'J',cod:'JOR',nombre:'Jordan',bandera:'🇯🇴',pagina:88},
+  {grupo:'K',cod:'POR',nombre:'Portugal',bandera:'🇵🇹',pagina:90},
+  {grupo:'K',cod:'COD',nombre:'Congo DR',bandera:'🇨🇩',pagina:92},
+  {grupo:'K',cod:'UZB',nombre:'Uzbekistan',bandera:'🇺🇿',pagina:94},
+  {grupo:'K',cod:'COL',nombre:'Colombia',bandera:'🇨🇴',pagina:96},
+  {grupo:'L',cod:'ENG',nombre:'England',bandera:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',pagina:98},
+  {grupo:'L',cod:'CRO',nombre:'Croatia',bandera:'🇭🇷',pagina:100},
+  {grupo:'L',cod:'GHA',nombre:'Ghana',bandera:'🇬🇭',pagina:102},
+  {grupo:'L',cod:'PAN',nombre:'Panama',bandera:'🇵🇦',pagina:104},
+];
+
+const TOTAL = 960;
+let datos = {};
+let filtroGrupo = 'ALL';
+let filtroVista = 'todas';
+
+function cargarDatos() {
+  const raw = localStorage.getItem('mundial2026');
+  if (raw) {
+    datos = JSON.parse(raw);
+  } else {
+    EQUIPOS.forEach(e => {
+      datos[e.cod] = Array(20).fill(0);
+    });
+    guardarDatos();
+  }
+}
+
+function guardarDatos() {
+  localStorage.setItem('mundial2026', JSON.stringify(datos));
+}
+
+function toggleStamp(cod, idx) {
+  datos[cod][idx] = (datos[cod][idx] + 1) % 3;
+  guardarDatos();
+  renderTodo();
+}
+
+function cargarLista(cod, inputId) {
+  const val = document.getElementById(inputId).value;
+  const nums = val.split(/[\s,]+/).map(n => parseInt(n)).filter(n => n >= 1 && n <= 20);
+  nums.forEach(n => { datos[cod][n-1] = 1; });
+  guardarDatos();
+  renderTodo();
+  mostrarToast(`${nums.length} estampas marcadas`);
+}
+
+function limpiarSeleccion(cod) {
+  datos[cod] = Array(20).fill(0);
+  guardarDatos();
+  renderTodo();
+  mostrarToast('Selección limpiada');
+}
+
+function statsGlobal() {
+  let tengo = 0, selcom = 0, repetidas = 0;
+  EQUIPOS.forEach(e => {
+    const arr = datos[e.cod] || Array(20).fill(0);
+    const t = arr.filter(v => v >= 1).length;
+    const r = arr.filter(v => v === 2).length;
+    tengo += t;
+    repetidas += r;
+    if(t===20) selcom++;
+  });
+  return {tengo, faltan: TOTAL-tengo, pct: Math.round(tengo/TOTAL*100), selcom, repetidas};
+}
+
+function statsEquipo(cod) {
+  if(!datos[cod]) return {tengo:0,faltan:20,repetidas:0};
+  const t = datos[cod].filter(v => v >= 1).length;
+  const r = datos[cod].filter(v => v === 2).length;
+  return {tengo:t, faltan:20-t, repetidas:r};
+}
+
+function renderTodo() {
+  const st = statsGlobal();
+  document.getElementById('s-tengo').textContent = st.tengo;
+  document.getElementById('s-faltan').textContent = st.faltan;
+  document.getElementById('s-pct').textContent = st.pct + '%';
+  document.getElementById('s-selcom').textContent = st.selcom;
+  document.getElementById('s-rep').textContent = st.repetidas;
+  document.getElementById('prog-global').style.width = st.pct + '%';
+  document.getElementById('header-sub').textContent = `${st.tengo} de ${TOTAL} estampas · ${st.pct}% completado`;
+
+  const container = document.getElementById('grupos-container');
+  const grupos = [...new Set(EQUIPOS.map(e => e.grupo))];
+  const abiertos = [...document.querySelectorAll('.sel-card.abierto')].map(el => el.dataset.cod);
+
+  let html = '';
+  grupos.forEach(g => {
+    if(filtroGrupo !== 'ALL' && filtroGrupo !== g) return;
+    const equipos = EQUIPOS.filter(e => e.grupo === g);
+    const gTengo = equipos.reduce((a,e) => a + (datos[e.cod]||Array(20).fill(0)).filter(v=>v>=1).length, 0);
+    const gTotal = equipos.length * 20;
+
+    let equiposHTML = '';
+    equipos.forEach(e => {
+      const st = statsEquipo(e.cod);
+      if(filtroVista === 'completas' && st.tengo < 20) return;
+      if(filtroVista === 'incompletas' && st.tengo === 20) return;
+      if(filtroVista === 'repetidas' && st.repetidas === 0) return;
+
+      const estaAbierto = abiertos.includes(e.cod);
+      const pct = Math.round(st.tengo/20*100);
+      const inputId = 'inp-'+e.cod;
+
+      let stampsHTML = '';
+      for(let i=0;i<20;i++){
+        const v = datos[e.cod] ? datos[e.cod][i] : 0;
+        const cls = v===2 ? ' repetida' : v===1 ? ' tengo' : '';
+        stampsHTML += `<div class="stamp${cls}" onclick="toggleStamp('${e.cod}',${i})">${i+1}</div>`;
+      }
+
+      equiposHTML += `
+        <div class="sel-card${estaAbierto?' abierto':''}" data-cod="${e.cod}">
+          <div class="sel-header" onclick="toggleCard('${e.cod}')">
+            <span class="sel-flag">${e.bandera}</span>
+            <span class="sel-nombre">${e.nombre}</span>
+            <span class="sel-codigo">${e.cod}</span>
+            <span class="sel-prog-text${st.tengo===20?' completo':''}">${st.tengo}/20</span>
+            <span class="chevron">▾</span>
+          </div>
+          <div class="sel-mini-bar"><div class="sel-mini-fill" style="width:${pct}%"></div></div>
+          <div class="carga-rapida">
+            <input class="carga-input" id="${inputId}" placeholder="Ej: 1,2,4,5,7" type="text">
+            <button class="btn-cargar" onclick="cargarLista('${e.cod}','${inputId}')">Cargar</button>
+            <button class="btn-limpiar" onclick="limpiarSeleccion('${e.cod}')">✕</button>
+          </div>
+          <div class="stamp-hint">Tap: sin estampa → tengo → repetida (dorado = para intercambio)</div>
+          <div class="estampas-grid">${stampsHTML}</div>
+        </div>`;
+    });
+
+    if(!equiposHTML) return;
+
+    html += `
+      <div>
+        <div class="grupo-header">
+          <div class="grupo-letra">${g}</div>
+          <div class="grupo-info">
+            <h2>Grupo ${g}</h2>
+            <p>${equipos.map(e=>e.nombre).join(' · ')}</p>
+          </div>
+          <div class="grupo-prog">${gTengo}/${gTotal}</div>
+        </div>
+        <div class="selecciones">${equiposHTML}</div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+}
+
+function toggleCard(cod) {
+  const card = document.querySelector(`.sel-card[data-cod="${cod}"]`);
+  if(card) card.classList.toggle('abierto');
+}
+
+document.getElementById('btn-grupos').addEventListener('click', e => {
+  if(!e.target.dataset.g) return;
+  document.querySelectorAll('#btn-grupos .btn-f').forEach(b => b.classList.remove('activo'));
+  e.target.classList.add('activo');
+  filtroGrupo = e.target.dataset.g;
+  renderTodo();
+});
+
+document.querySelector('.filtros-vista').addEventListener('click', e => {
+  if(!e.target.dataset.v) return;
+  document.querySelectorAll('.btn-vista').forEach(b => b.classList.remove('activo'));
+  e.target.classList.add('activo');
+  filtroVista = e.target.dataset.v;
+  renderTodo();
+});
+
+function mostrarToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function exportarJSON() {
+  const blob = new Blob([JSON.stringify({version:1,datos}, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mundial2026_backup.json';
+  a.click();
+  mostrarToast('Backup guardado');
+}
+
+function importarJSON() {
+  document.getElementById('file-input').click();
+}
+
+function cargarArchivoJSON(e) {
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const obj = JSON.parse(ev.target.result);
+      if(obj.datos) { datos = obj.datos; guardarDatos(); renderTodo(); mostrarToast('Backup cargado'); }
+    } catch { mostrarToast('Archivo inválido'); }
+  };
+  reader.readAsText(f);
+}
+
+function exportarFaltantes() {
+  let txt = 'ESTAMPAS FALTANTES - MUNDIAL 2026\n\n';
+  EQUIPOS.forEach(e => {
+    const faltantes = [];
+    (datos[e.cod]||[]).forEach((v,i) => { if(!v) faltantes.push(i+1); });
+    if(faltantes.length > 0) txt += `${e.nombre} (${e.cod}): ${faltantes.join(', ')}\n`;
+  });
+  const blob = new Blob([txt], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'faltantes_mundial2026.txt';
+  a.click();
+}
+
+function exportarRepetidas() {
+  let txt = 'ESTAMPAS PARA INTERCAMBIO - MUNDIAL 2026\n\n';
+  let total = 0;
+  EQUIPOS.forEach(e => {
+    const reps = [];
+    (datos[e.cod]||[]).forEach((v,i) => { if(v===2) reps.push(i+1); });
+    if(reps.length > 0) { txt += `${e.nombre} (${e.cod}): ${reps.join(', ')}\n`; total += reps.length; }
+  });
+  txt += `\nTotal repetidas: ${total}`;
+  const blob = new Blob([txt], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'intercambio_mundial2026.txt';
+  a.click();
+}
+
+
+const DRIVE_FILE_NAME = 'mundial2026_backup.json';
+const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
+let driveToken = null;
+let driveFileId = null;
+
+function getClientId() {
+  const meta = document.querySelector('meta[name="google-client-id"]');
+  return meta ? meta.getAttribute('content') : null;
+}
+
+function driveLogin() {
+  const clientId = getClientId();
+  if(!clientId || clientId === 'TU_CLIENT_ID_AQUI') {
+    mostrarToast('Agrega tu Client ID primero');
+    return;
+  }
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: clientId,
+    scope: DRIVE_SCOPE,
+    callback: (resp) => {
+      if(resp.access_token) {
+        driveToken = resp.access_token;
+        setDriveConectado(true);
+        mostrarToast('Google Drive conectado');
+        buscarArchivoDrive();
+      }
+    }
+  });
+  client.requestAccessToken();
+}
+
+function driveLogout() {
+  driveToken = null;
+  driveFileId = null;
+  setDriveConectado(false);
+  mostrarToast('Sesión cerrada');
+}
+
+function setDriveConectado(conectado) {
+  document.getElementById('drive-status').textContent = conectado ? '🟢 Google Drive: conectado' : '⚪ Google Drive: no conectado';
+  document.getElementById('drive-status').className = 'drive-status' + (conectado ? ' conectado' : '');
+  document.getElementById('btn-login').classList.toggle('hidden', conectado);
+  document.getElementById('btn-guardar-drive').classList.toggle('hidden', !conectado);
+  document.getElementById('btn-cargar-drive').classList.toggle('hidden', !conectado);
+  document.getElementById('btn-logout').classList.toggle('hidden', !conectado);
+}
+
+async function buscarArchivoDrive() {
+  if(!driveToken) return;
+  const res = await fetch(
+    `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${DRIVE_FILE_NAME}'&fields=files(id,name,modifiedTime)`,
+    { headers: { Authorization: `Bearer ${driveToken}` } }
+  );
+  const data = await res.json();
+  if(data.files && data.files.length > 0) {
+    driveFileId = data.files[0].id;
+    const fecha = new Date(data.files[0].modifiedTime).toLocaleDateString('es-MX');
+    mostrarToast(`Archivo encontrado en Drive (${fecha})`);
+  }
+}
+
+async function guardarEnDrive() {
+  if(!driveToken) return;
+  const btn = document.getElementById('btn-guardar-drive');
+  btn.disabled = true;
+  btn.textContent = '☁️ Guardando...';
+  const contenido = JSON.stringify({version:1, datos}, null, 2);
+  const blob = new Blob([contenido], {type:'application/json'});
+  let url, method;
+  if(driveFileId) {
+    url = `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`;
+    method = 'PATCH';
+  } else {
+    const meta = await fetch('https://www.googleapis.com/drive/v3/files', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${driveToken}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: DRIVE_FILE_NAME, parents: ['appDataFolder'] })
+    });
+    const mdata = await meta.json();
+    driveFileId = mdata.id;
+    url = `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`;
+    method = 'PATCH';
+  }
+  await fetch(url, {
+    method,
+    headers: { Authorization: `Bearer ${driveToken}`, 'Content-Type': 'application/json' },
+    body: blob
+  });
+  btn.disabled = false;
+  btn.textContent = '☁️ Guardar en Drive';
+  mostrarToast('Guardado en Google Drive');
+}
+
+async function cargarDesdeDrive() {
+  if(!driveToken) return;
+  const btn = document.getElementById('btn-cargar-drive');
+  btn.disabled = true;
+  btn.textContent = '📥 Cargando...';
+  await buscarArchivoDrive();
+  if(!driveFileId) { mostrarToast('No hay archivo en Drive todavía'); btn.disabled=false; btn.textContent='📥 Cargar desde Drive'; return; }
+  const res = await fetch(
+    `https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,
+    { headers: { Authorization: `Bearer ${driveToken}` } }
+  );
+  const obj = await res.json();
+  if(obj.datos) {
+    datos = obj.datos;
+    guardarDatos();
+    renderTodo();
+    mostrarToast('Datos cargados desde Drive');
+  }
+  btn.disabled = false;
+  btn.textContent = '📥 Cargar desde Drive';
+}
+
+cargarDatos();
+renderTodo();
+</script>
+</body>
+</html>
